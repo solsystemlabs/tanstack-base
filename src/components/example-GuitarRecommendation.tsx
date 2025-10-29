@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { getGuitarById } from '../server/guitars'
-import type { Guitar } from '../../generated/prisma/client'
+import type { Guitar } from '@prisma/client'
 
 import { showAIAssistant } from './example-AIAssistant'
 
