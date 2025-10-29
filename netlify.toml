@@ -1,5 +1,5 @@
 [build]
-  command = "vite build"
+  command = "prisma migrate deploy && vite build"
   dir = "dist/client"
 [dev]
   command = "vite dev"
