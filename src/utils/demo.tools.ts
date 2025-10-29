@@ -1,8 +1,7 @@
 import { experimental_createMCPClient, tool } from 'ai'
 //import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { z } from 'zod'
-
-import guitars from '../data/example-guitars'
+import { prisma } from '../lib/prisma'
 
 // Example of using an SSE MCP server
 // const mcpClient = await experimental_createMCPClient({
@@ -27,7 +26,10 @@ const getGuitars = tool({
   description: 'Get all products from the database',
   inputSchema: z.object({}),
   execute: async () => {
-    return Promise.resolve(guitars)
+    const guitars = await prisma.guitar.findMany({
+      orderBy: { id: 'asc' },
+    })
+    return guitars
   },
 })
 

@@ -1,11 +1,17 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import guitars from '../../data/example-guitars'
+import { getGuitars } from '../../server/guitars'
 
 export const Route = createFileRoute('/example/guitars/')({
   component: GuitarsIndex,
+  loader: async () => {
+    const guitars = await getGuitars()
+    return { guitars }
+  },
 })
 
 function GuitarsIndex() {
+  const { guitars } = Route.useLoaderData()
+
   return (
     <div className="bg-black text-white p-5">
       <h1 className="text-3xl font-bold mb-8 text-center">Featured Guitars</h1>

@@ -1,12 +1,22 @@
 import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { getGuitarById } from '../server/guitars'
+import type { Guitar } from '../../generated/prisma/client'
 
 import { showAIAssistant } from './example-AIAssistant'
 
-import guitars from '../data/example-guitars'
-
 export default function GuitarRecommendation({ id }: { id: string }) {
   const navigate = useNavigate()
-  const guitar = guitars.find((guitar) => guitar.id === +id)
+  const [guitar, setGuitar] = useState<Guitar | null>(null)
+
+  useEffect(() => {
+    async function fetchGuitar() {
+      const foundGuitar = await getGuitarById({ data: id })
+      setGuitar(foundGuitar)
+    }
+    fetchGuitar()
+  }, [id])
+
   if (!guitar) {
     return null
   }

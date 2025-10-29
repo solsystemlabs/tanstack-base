@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: tanstack-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: tanstack
+      POSTGRES_PASSWORD: tanstack_dev_password
+      POSTGRES_DB: tanstack_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tanstack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
