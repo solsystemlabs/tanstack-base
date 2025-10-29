@@ -1,6 +1,11 @@
 [build]
-  command = "prisma migrate deploy && vite build"
-  dir = "dist/client"
+command = "prisma migrate deploy && vite build"
+dir = "dist/client"
+
+[functions]
+node_bundler = "esbuild"
+external_node_modules = ["@prisma/client"]
+
 [dev]
-  command = "vite dev"
-  port = 3000
+command = "vite dev"
+port = 3000
