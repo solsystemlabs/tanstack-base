@@ -18,9 +18,6 @@
     "db:migrate": "npx prisma migrate dev",
     "db:studio": "npx prisma studio"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.1",
     "@ai-sdk/react": "^2.0.8",
