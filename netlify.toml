@@ -1,10 +1,11 @@
 [build]
 command = "prisma migrate deploy && vite build"
 dir = "dist/client"
+environment = { SECRETS_SCAN_OMIT_KEYS = "S3_REGION,S3_BUCKET,S3_FORCE_PATH_STYLE" }
 
 [functions]
 node_bundler = "esbuild"
-external_node_modules = ["@prisma/client"]
+external_node_modules = ["@prisma/client", "@aws-sdk/client-s3", "@aws-sdk/s3-request-presigner"]
 
 [dev]
 command = "vite dev"

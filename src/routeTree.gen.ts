@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoUploadRouteImport } from './routes/demo/upload'
 import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
@@ -26,6 +27,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoUploadRoute = DemoUploadRouteImport.update({
+  id: '/demo/upload',
+  path: '/demo/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanchatRoute = DemoTanchatRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
+  '/demo/upload': typeof DemoUploadRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
+  '/demo/upload': typeof DemoUploadRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
+  '/demo/upload': typeof DemoUploadRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanchat'
+    | '/demo/upload'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/start/api-request'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanchat'
+    | '/demo/upload'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/start/api-request'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/store'
     | '/demo/tanchat'
+    | '/demo/upload'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/start/api-request'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTanchatRoute: typeof DemoTanchatRoute
+  DemoUploadRoute: typeof DemoUploadRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTanchatRoute: typeof DemoApiTanchatRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/upload': {
+      id: '/demo/upload'
+      path: '/demo/upload'
+      fullPath: '/demo/upload'
+      preLoaderRoute: typeof DemoUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanchat': {
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTanchatRoute: DemoTanchatRoute,
+  DemoUploadRoute: DemoUploadRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTanchatRoute: DemoApiTanchatRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

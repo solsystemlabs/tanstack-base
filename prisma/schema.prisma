@@ -26,3 +26,17 @@ model Guitar {
 
   @@map("guitars")
 }
+
+// Optional model for tracking uploaded files
+// Minimal tracking: just S3 key, filename, size, and type
+model Upload {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique // S3 object key
+  filename    String   // Original filename
+  size        Int      // File size in bytes
+  contentType String   // MIME type
+  createdAt   DateTime @default(now())
+
+  @@map("uploads")
+  @@index([createdAt])
+}
