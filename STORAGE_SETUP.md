@@ -137,16 +137,30 @@ In your Netlify dashboard:
 1. Go to **Site settings** → **Environment variables**
 2. Add the following variables:
 
-| Variable | Value |
-|----------|-------|
-| `S3_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
-| `S3_ACCESS_KEY_ID` | Your R2 Access Key ID |
-| `S3_SECRET_ACCESS_KEY` | Your R2 Secret Access Key |
-| `S3_BUCKET` | `tanstack-production` |
-| `S3_REGION` | `auto` |
-| `S3_FORCE_PATH_STYLE` | `false` |
+| Variable | Value | Secret? |
+|----------|-------|---------|
+| `S3_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` | No |
+| `S3_ACCESS_KEY_ID` | Your R2 Access Key ID | **Yes ⚠️** |
+| `S3_SECRET_ACCESS_KEY` | Your R2 Secret Access Key | **Yes ⚠️** |
+| `S3_BUCKET` | `tanstack-production` | No |
+| `S3_REGION` | `auto` | No |
+| `S3_FORCE_PATH_STYLE` | `false` | No |
 
 **Important:** Set these variables for the **Production** and **Deploy Preview** contexts.
+
+#### Understanding Secret vs Non-Secret Values
+
+**Actual Secrets (Never commit these!):**
+- `S3_ACCESS_KEY_ID` - Grants access to your R2 storage
+- `S3_SECRET_ACCESS_KEY` - Used to authenticate API requests
+
+**Non-Secret Configuration (Safe to appear in docs/code):**
+- `S3_ENDPOINT` - Public endpoint URL
+- `S3_BUCKET` - Bucket name (not sensitive)
+- `S3_REGION` - AWS region or "auto" for R2
+- `S3_FORCE_PATH_STYLE` - Boolean configuration flag
+
+The `netlify.toml` file includes `SECRETS_SCAN_OMIT_KEYS` to tell Netlify's secrets scanner that bucket names, regions, and path style settings are safe to appear in documentation and build output.
 
 ### 5. Verify Build Settings
 
@@ -156,13 +170,17 @@ Your `netlify.toml` should already be configured correctly:
 [build]
 command = "prisma migrate deploy && vite build"
 dir = "dist/client"
+environment = { SECRETS_SCAN_OMIT_KEYS = "S3_REGION,S3_BUCKET,S3_FORCE_PATH_STYLE" }
 
 [functions]
 node_bundler = "esbuild"
 external_node_modules = ["@prisma/client", "@aws-sdk/client-s3", "@aws-sdk/s3-request-presigner"]
 ```
 
-**Note:** The AWS SDK packages must be externalized to work properly in Netlify Functions.
+**Important Notes:**
+- The AWS SDK packages must be externalized to work properly in Netlify Functions
+- `SECRETS_SCAN_OMIT_KEYS` tells Netlify's secrets scanner to skip non-sensitive config values (bucket name, region, etc.)
+- Only `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` are actual secrets that should never appear in code or documentation
 
 ### 6. Deploy and Test
 

@@ -1,8 +1,5 @@
 import { Link } from '@tanstack/react-router'
 
-import TanChatAIAssistant from './example-AIAssistant.tsx'
-
-import { useState } from 'react'
 import {
   ChevronDown,
   ChevronRight,
@@ -14,8 +11,11 @@ import {
   SquareFunction,
   StickyNote,
   Store,
+  Upload,
   X,
 } from 'lucide-react'
+import { useState } from 'react'
+import TanChatAIAssistant from './example-AIAssistant.tsx'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -100,6 +100,19 @@ export default function Header() {
           >
             <Guitar size={20} />
             <span className="font-medium">Guitar Demo</span>
+          </Link>
+
+          <Link
+            to="/demo/upload"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            activeProps={{
+              className:
+                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+            }}
+          >
+            <Upload size={20} />
+            <span className="font-medium">Upload</span>
           </Link>
 
           <Link

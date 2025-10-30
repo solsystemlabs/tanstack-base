@@ -1,13 +1,12 @@
-import { createServerFn } from '@tanstack/react-start'
 import {
+  AbortMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
   UploadPartCommand,
-  CompleteMultipartUploadCommand,
-  AbortMultipartUploadCommand,
-  type CompletedPart,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { s3Client, getS3Bucket, generateS3Key } from '../lib/s3'
+import { createServerFn } from '@tanstack/react-start'
+import { generateS3Key, getS3Bucket, s3Client } from '../lib/s3'
 
 /**
  * Allowed MIME types for upload
@@ -69,12 +68,12 @@ const PRESIGNED_URL_EXPIRATION = 3600 // 1 hour
 function validateFile(
   filename: string,
   fileSize: number,
-  contentType: string
+  contentType: string,
 ): void {
   // Check file size
   if (fileSize > MAX_FILE_SIZE) {
     throw new Error(
-      `File size exceeds maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+      `File size exceeds maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
     )
   }
 
@@ -86,7 +85,7 @@ function validateFile(
   if (!ALLOWED_MIME_TYPES.includes(contentType)) {
     throw new Error(
       `Content type "${contentType}" is not allowed. ` +
-        `Allowed types: ${ALLOWED_MIME_TYPES.join(', ')}`
+        `Allowed types: ${ALLOWED_MIME_TYPES.join(', ')}`,
     )
   }
 
@@ -103,7 +102,10 @@ function validateFile(
 /**
  * Calculate the number of parts needed for a multipart upload
  */
-function calculatePartCount(fileSize: number, partSize: number = DEFAULT_PART_SIZE): number {
+function calculatePartCount(
+  fileSize: number,
+  partSize: number = DEFAULT_PART_SIZE,
+): number {
   return Math.ceil(fileSize / partSize)
 }
 
@@ -117,12 +119,14 @@ function calculatePartCount(fileSize: number, partSize: number = DEFAULT_PART_SI
  * 4. Returns the upload ID and key for subsequent operations
  */
 export const initiateMultipartUpload = createServerFn({ method: 'POST' })
-  .inputValidator((data: {
-    filename: string
-    fileSize: number
-    contentType: string
-    prefix?: string
-  }) => data)
+  .inputValidator(
+    (data: {
+      filename: string
+      fileSize: number
+      contentType: string
+      prefix?: string
+    }) => data,
+  )
   .handler(async ({ data }) => {
     const { filename, fileSize, contentType, prefix } = data
 
@@ -137,7 +141,7 @@ export const initiateMultipartUpload = createServerFn({ method: 'POST' })
     if (partCount > MAX_PARTS) {
       throw new Error(
         `File is too large for multipart upload. ` +
-          `Maximum ${MAX_PARTS} parts allowed.`
+          `Maximum ${MAX_PARTS} parts allowed.`,
       )
     }
 
@@ -160,7 +164,9 @@ export const initiateMultipartUpload = createServerFn({ method: 'POST' })
       const response = await s3Client.send(command)
 
       if (!response.UploadId) {
-        throw new Error('Failed to initiate multipart upload: No upload ID returned')
+        throw new Error(
+          'Failed to initiate multipart upload: No upload ID returned',
+        )
       }
 
       return {
@@ -172,7 +178,7 @@ export const initiateMultipartUpload = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Error initiating multipart upload:', error)
       throw new Error(
-        `Failed to initiate upload: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to initiate upload: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
     }
   })
@@ -184,11 +190,9 @@ export const initiateMultipartUpload = createServerFn({ method: 'POST' })
  * to upload a part directly to S3 without going through the server.
  */
 export const getUploadPartUrl = createServerFn({ method: 'POST' })
-  .inputValidator((data: {
-    uploadId: string
-    key: string
-    partNumber: number
-  }) => data)
+  .inputValidator(
+    (data: { uploadId: string; key: string; partNumber: number }) => data,
+  )
   .handler(async ({ data }) => {
     const { uploadId, key, partNumber } = data
 
@@ -224,7 +228,7 @@ export const getUploadPartUrl = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Error generating presigned URL for part:', error)
       throw new Error(
-        `Failed to generate upload URL: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to generate upload URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
     }
   })
@@ -236,11 +240,13 @@ export const getUploadPartUrl = createServerFn({ method: 'POST' })
  * to assemble all the uploaded parts into a single object.
  */
 export const completeMultipartUpload = createServerFn({ method: 'POST' })
-  .inputValidator((data: {
-    uploadId: string
-    key: string
-    parts: Array<{ partNumber: number; etag: string }>
-  }) => data)
+  .inputValidator(
+    (data: {
+      uploadId: string
+      key: string
+      parts: Array<{ partNumber: number; etag: string }>
+    }) => data,
+  )
   .handler(async ({ data }) => {
     const { uploadId, key, parts } = data
 
@@ -292,7 +298,7 @@ export const completeMultipartUpload = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Error completing multipart upload:', error)
       throw new Error(
-        `Failed to complete upload: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to complete upload: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
     }
   })
@@ -304,10 +310,7 @@ export const completeMultipartUpload = createServerFn({ method: 'POST' })
  * cleans up any uploaded parts.
  */
 export const abortMultipartUpload = createServerFn({ method: 'POST' })
-  .inputValidator((data: {
-    uploadId: string
-    key: string
-  }) => data)
+  .inputValidator((data: { uploadId: string; key: string }) => data)
   .handler(async ({ data }) => {
     const { uploadId, key } = data
 
@@ -335,7 +338,7 @@ export const abortMultipartUpload = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Error aborting multipart upload:', error)
       throw new Error(
-        `Failed to abort upload: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to abort upload: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
     }
   })

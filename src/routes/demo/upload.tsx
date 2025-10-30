@@ -266,32 +266,39 @@ S3_FORCE_PATH_STYLE=true`}
                     <tr className="border-b border-gray-300 dark:border-gray-700">
                       <th className="text-left py-2 text-gray-900 dark:text-white">Variable</th>
                       <th className="text-left py-2 text-gray-900 dark:text-white">Value</th>
+                      <th className="text-left py-2 text-gray-900 dark:text-white">Secret?</th>
                     </tr>
                   </thead>
                   <tbody className="text-gray-800 dark:text-gray-200">
                     <tr className="border-b border-gray-200 dark:border-gray-800">
                       <td className="py-2 font-mono">S3_ENDPOINT</td>
                       <td className="py-2">https://&lt;account-id&gt;.r2.cloudflarestorage.com</td>
+                      <td className="py-2 text-gray-500 dark:text-gray-400">No</td>
                     </tr>
-                    <tr className="border-b border-gray-200 dark:border-gray-800">
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-red-50 dark:bg-red-950">
                       <td className="py-2 font-mono">S3_ACCESS_KEY_ID</td>
                       <td className="py-2">Your R2 Access Key ID</td>
+                      <td className="py-2 text-red-600 dark:text-red-400 font-semibold">Yes ⚠️</td>
                     </tr>
-                    <tr className="border-b border-gray-200 dark:border-gray-800">
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-red-50 dark:bg-red-950">
                       <td className="py-2 font-mono">S3_SECRET_ACCESS_KEY</td>
                       <td className="py-2">Your R2 Secret Access Key</td>
+                      <td className="py-2 text-red-600 dark:text-red-400 font-semibold">Yes ⚠️</td>
                     </tr>
                     <tr className="border-b border-gray-200 dark:border-gray-800">
                       <td className="py-2 font-mono">S3_BUCKET</td>
                       <td className="py-2">tanstack-production</td>
+                      <td className="py-2 text-gray-500 dark:text-gray-400">No</td>
                     </tr>
                     <tr className="border-b border-gray-200 dark:border-gray-800">
                       <td className="py-2 font-mono">S3_REGION</td>
                       <td className="py-2">auto</td>
+                      <td className="py-2 text-gray-500 dark:text-gray-400">No</td>
                     </tr>
                     <tr>
                       <td className="py-2 font-mono">S3_FORCE_PATH_STYLE</td>
                       <td className="py-2">false</td>
+                      <td className="py-2 text-gray-500 dark:text-gray-400">No</td>
                     </tr>
                   </tbody>
                 </table>
@@ -299,6 +306,15 @@ S3_FORCE_PATH_STYLE=true`}
               <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
                 <p className="text-xs text-blue-800 dark:text-blue-200">
                   <strong>Note:</strong> Set these variables for the <strong>Production</strong> and <strong>Deploy Preview</strong> contexts.
+                </p>
+              </div>
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded">
+                <p className="text-xs text-red-800 dark:text-red-200 mb-2">
+                  <strong>⚠️ Security Warning:</strong> Only <code className="bg-red-100 dark:bg-red-900 px-1 rounded">S3_ACCESS_KEY_ID</code> and <code className="bg-red-100 dark:bg-red-900 px-1 rounded">S3_SECRET_ACCESS_KEY</code> are actual secrets!
+                </p>
+                <p className="text-xs text-red-800 dark:text-red-200">
+                  The other values (endpoint, bucket name, region) are safe to appear in documentation and code.
+                  Netlify's secrets scanner is configured to skip scanning for these non-sensitive values.
                 </p>
               </div>
             </div>
@@ -312,14 +328,19 @@ S3_FORCE_PATH_STYLE=true`}
 {`[build]
 command = "prisma migrate deploy && vite build"
 dir = "dist/client"
+environment = { SECRETS_SCAN_OMIT_KEYS = "S3_REGION,S3_BUCKET,S3_FORCE_PATH_STYLE" }
 
 [functions]
 node_bundler = "esbuild"
-external_node_modules = ["@prisma/client", "@aws-sdk/client-s3"]`}
+external_node_modules = ["@prisma/client", "@aws-sdk/client-s3", "@aws-sdk/s3-request-presigner"]`}
               </pre>
               <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded">
-                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                <p className="text-xs text-yellow-800 dark:text-yellow-200 mb-2">
                   <strong>Important:</strong> The AWS SDK packages must be externalized to work properly in Netlify Functions.
+                </p>
+                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                  <strong>Secrets Scanning:</strong> <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">SECRETS_SCAN_OMIT_KEYS</code> tells
+                  Netlify that bucket name, region, and path style settings are safe to appear in code/docs.
                 </p>
               </div>
             </div>
